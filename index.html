@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Осада на бумаге · 10x20 · Компактная версия</title>
+  <title>Осада на бумаге · 10x20 · Исправленная версия</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif; }
     body {
@@ -456,7 +456,7 @@
             }
             div.textContent = symbol;
             if(cls) div.classList.add(cls);
-            div.addEventListener('click', (function(row,col){ return function(){ handleCellClick(row,col); }; })(r,c));
+            div.addEventListener('click', (function(row,col){ return function(){ handleCellClick(row,col); }; })(r,c-startCol));
             boardEl.appendChild(div);
           }
         }
@@ -550,13 +550,22 @@
       return true;
     }
     
-    function handleCellClick(row,col){
+    function handleCellClick(virtualRow, virtualCol){
       if(phase==='action' && checkGameOver()) return;
-      // Ремонт
+      
+      // Преобразование координат в зависимости от вкладки и игрока
+      let globalCol = virtualCol;
+      if(currentTab === 'base'){
+        if(currentPlayer === 0) globalCol = virtualCol;
+        else globalCol = virtualCol + 10;
+      }
+      const row = virtualRow;
+      const col = globalCol;
+      
+      // Режим ремонта
       if(repairModeActive){
         if(currentTab!=='base'){ alert('Переключитесь на "Моё поле"'); return; }
-        let realCol = (currentPlayer===0) ? col : col+10;
-        const cell = board[row][realCol];
+        const cell = board[row][col];
         if(!cell || cell.owner!==currentPlayer) return;
         if(!cell.ruined && !(cell.type==='castle' && cell.hp<CASTLE_MAX_HP)){ alert('Здание не повреждено'); return; }
         if(players[currentPlayer].gold<REPAIR_COST){ alert('Недостаточно золота'); return; }
@@ -574,54 +583,53 @@
         return;
       }
       
-      let globalCol = col;
-      if(currentTab === 'base'){
-        if(currentPlayer === 0) globalCol = col;
-        else globalCol = col + 10;
-      }
-      
+      // Фаза расстановки (строительство бесплатно)
       if(phase==='setup' && currentTab==='base' && !attackModeActive && !repairModeActive){
-        if(getPlayerZone(globalCol)!==currentPlayer){ alert('Стройте на своей половине'); return; }
-        if(board[row][globalCol] && board[row][globalCol].owner===currentPlayer){
-          if(deleteBuilding(row,globalCol)){
+        if(getPlayerZone(col)!==currentPlayer){ alert('Стройте только на своей половине!'); return; }
+        // Если на клетке уже есть здание этого игрока — удаляем его (кроме замка)
+        if(board[row][col] && board[row][col].owner===currentPlayer){
+          if(deleteBuilding(row,col)){
             updateUI();
             alert('Здание удалено');
           }
           return;
         }
-        if(countAllPlayerBuildings(currentPlayer)>=MAX_BUILDINGS){ alert('Лимит 15 построек'); return; }
-        if(board[row][globalCol] || ash[row][globalCol]){ alert('Клетка занята'); return; }
+        if(countAllPlayerBuildings(currentPlayer)>=MAX_BUILDINGS){ alert(`Лимит ${MAX_BUILDINGS} построек`); return; }
+        if(board[row][col] || ash[row][col]){ alert('Клетка занята или выжжена'); return; }
         const type=window.selectedBuildingType;
-        if(!type){ alert('Выберите тип'); return; }
-        if(type==='castle' && hasCastle(currentPlayer)){ alert('Замок уже есть'); return; }
-        if(type==='mine' && countBuildingsOfType(currentPlayer,'mine')>=BASE_MINE_LIMIT){ alert(`Не более ${BASE_MINE_LIMIT} рудников в расстановке`); return; }
-        board[row][globalCol]={ owner:currentPlayer, type, hp:type==='castle'?CASTLE_MAX_HP:1, ruined:false };
-        revealed[currentPlayer][row][globalCol]=true;
+        if(!type){ alert('Выберите тип постройки'); return; }
+        if(type==='castle' && hasCastle(currentPlayer)){ alert('У вас уже есть замок!'); return; }
+        if(type==='mine' && countBuildingsOfType(currentPlayer,'mine')>=BASE_MINE_LIMIT){ alert(`В расстановке можно построить не более ${BASE_MINE_LIMIT} рудников`); return; }
+        // Строим
+        board[row][col]={ owner:currentPlayer, type, hp:type==='castle'?CASTLE_MAX_HP:1, ruined:false };
+        revealed[currentPlayer][row][col]=true;
         updateUI();
         return;
       }
       
+      // Строительство в боевой фазе (за золото)
       if(phase==='action' && currentTab==='base' && !attackModeActive && !repairModeActive){
         const type=window.selectedBuildingType;
-        if(!type){ alert('Выберите тип'); return; }
+        if(!type){ alert('Выберите тип постройки'); return; }
         if(type==='castle'){ alert('Нельзя построить новый замок'); return; }
-        if(getPlayerZone(globalCol)!==currentPlayer){ alert('Только своя половина'); return; }
-        if(board[row][globalCol] || ash[row][globalCol]){ alert('Клетка занята'); return; }
-        if(countAllPlayerBuildings(currentPlayer)>=MAX_BUILDINGS){ alert('Лимит 15 построек'); return; }
+        if(getPlayerZone(col)!==currentPlayer){ alert('Строить можно только на своей половине'); return; }
+        if(board[row][col] || ash[row][col]){ alert('Клетка занята или выжжена'); return; }
+        if(countAllPlayerBuildings(currentPlayer)>=MAX_BUILDINGS){ alert(`Лимит ${MAX_BUILDINGS} построек`); return; }
         const mineLimit=getMineLimit(currentPlayer);
         if(type==='mine' && countBuildingsOfType(currentPlayer,'mine')>=mineLimit){ alert(`Максимум рудников: ${mineLimit} (бонус за слабость врага)`); return; }
-        if(players[currentPlayer].gold<BUILD_COST){ alert(`Нужно ${BUILD_COST} золота`); return; }
-        board[row][globalCol]={ owner:currentPlayer, type, hp:1, ruined:false };
+        if(players[currentPlayer].gold<BUILD_COST){ alert(`Недостаточно золота, нужно ${BUILD_COST}`); return; }
+        board[row][col]={ owner:currentPlayer, type, hp:1, ruined:false };
         players[currentPlayer].gold-=BUILD_COST;
-        revealed[currentPlayer][row][globalCol]=true;
+        revealed[currentPlayer][row][col]=true;
         updateUI();
         return;
       }
       
+      // Атака (только на карте разведки)
       if(phase==='action' && attackModeActive){
-        if(currentTab!=='map'){ alert('Переключитесь на "Карту разведки"'); return; }
-        if(attacksRemaining<=0){ attackModeActive=false; updateUI(); alert('Нет атак'); return; }
-        const result=performAttack(row,globalCol);
+        if(currentTab!=='map'){ alert('Для атаки переключитесь на "Карту разведки"'); return; }
+        if(attacksRemaining<=0){ attackModeActive=false; updateUI(); alert('Нет доступных атак'); return; }
+        const result=performAttack(row,col);
         alert(result.reason);
         if(result.costAttack!==false) attacksRemaining--;
         if(attacksRemaining<=0) attackModeActive=false;
@@ -661,14 +669,14 @@
     const attackBtn = document.getElementById('attack-mode-btn');
     attackBtn.addEventListener('click',()=>{
       if(attackBtn.disabled) return;
-      if(repairModeActive){ alert('Завершите ремонт'); return; }
+      if(repairModeActive){ alert('Завершите режим ремонта'); return; }
       if(attackModeActive){
         attackModeActive=false;
         updateUI();
         alert('Режим атаки отменён');
       } else {
         const available=getAvailableRegiments(currentPlayer);
-        if(available<=0){ alert('Нет полков'); return; }
+        if(available<=0){ alert('Нет доступных полков'); return; }
         attackModeActive=true;
         attacksRemaining=available;
         currentTab='map';
