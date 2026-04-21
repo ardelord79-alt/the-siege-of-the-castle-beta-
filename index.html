@@ -3,126 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Осада на бумаге · 10x20 · Исправленная версия</title>
+  <title>Siege on Paper · Осада на бумаге</title>
   <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: linear-gradient(145deg, #ddd0b6 0%, #c7b894 100%);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 12px;
-    }
-    .game-container {
-      max-width: 1000px;
-      width: 100%;
-      background: #fef7e8;
-      border-radius: 28px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-      padding: 12px 15px 15px;
-      border: 1px solid #cbbd9a;
-    }
-    h1 {
-      text-align: center;
-      margin: 0 0 6px;
-      font-size: 1.5rem;
-      color: #2c3e2f;
-      text-shadow: 2px 2px 0 #e2d5b6;
-    }
-    .players-panel {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #e9e0cb;
-      padding: 6px 18px;
-      border-radius: 40px;
-      margin-bottom: 12px;
-    }
-    .player-badge {
-      background: #fff3e0;
-      border-radius: 30px;
-      padding: 3px 15px;
-      text-align: center;
-      box-shadow: 0 2px 0 #baa77d;
-    }
-    .player-name { font-weight: bold; font-size: 1rem; }
+    * { box-sizing: border-box; font-family: 'Segoe UI', 'Comic Sans MS', cursive, sans-serif; user-select: none; }
+    body { margin: 0; min-height: 100vh; background: linear-gradient(145deg, #ddd0b6 0%, #c7b894 100%); display: flex; justify-content: center; align-items: center; padding: 12px; transition: background 0.2s; }
+    body.dark { background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%); }
+    body.dark .game-container, body.dark .menu-container { background: #2c2c2c; border-color: #5a5a5a; color: #eee; }
+    body.dark .player-badge, body.dark .tab-btn, body.dark .build-btn, body.dark .repair-btn, body.dark .primary-btn, body.dark .status-message, body.dark .action-panel, body.dark .info-panel { background: #3a3a3a; color: #eee; border-color: #666; }
+    body.dark .cell { background-color: #4a4a4a; color: #ddd; }
+    body.dark .cell.fog { background: #2e3e2e; }
+    body.dark .turn-indicator { background: #1e3a1e; }
+    .menu-container, .game-container { max-width: 1100px; width: 100%; background: #fef7e8; border-radius: 28px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); padding: 20px; border: 1px solid #cbbd9a; transition: all 0.2s; }
+    .hidden { display: none !important; }
+    .menu-title { text-align: center; font-size: 2rem; margin-bottom: 30px; }
+    .menu-buttons { display: flex; flex-direction: column; gap: 15px; max-width: 300px; margin: 0 auto; }
+    .menu-btn { background: #5c7c5a; border: none; color: white; padding: 12px; border-radius: 60px; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #2e4a2c; transition: 0.05s linear; }
+    .menu-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #2e4a2c; }
+    .menu-btn.small { font-size: 1rem; padding: 8px; }
+    .settings-panel, .encyclopedia-panel { background: #e9e0cb; border-radius: 20px; padding: 15px; margin-top: 20px; }
+    .setting-row { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
+    select, button.setting-btn { background: #f5ebd2; border: 1px solid #9b8a64; padding: 5px 10px; border-radius: 20px; cursor: pointer; }
+    .players-panel { display: flex; justify-content: space-between; align-items: center; background: #e9e0cb; padding: 6px 18px; border-radius: 40px; margin-bottom: 12px; flex-wrap: wrap; }
+    .player-badge { background: #fff3e0; border-radius: 30px; padding: 3px 15px; text-align: center; box-shadow: 0 2px 0 #baa77d; min-width: 120px; }
     .resources { display: flex; gap: 8px; justify-content: center; margin-top: 2px; }
-    .gold-display, .attack-display {
-      background: #d9c9a8;
-      border-radius: 30px;
-      padding: 2px 10px;
-      font-weight: bold;
-      font-size: 0.9rem;
-    }
-    .turn-indicator {
-      background: #5d7a5c;
-      color: white;
-      padding: 5px 20px;
-      border-radius: 40px;
-      font-weight: bold;
-      font-size: 1.1rem;
-      box-shadow: inset 0 -1px 0 #2d4a2c;
-    }
-    .tab-bar {
-      display: flex;
-      gap: 8px;
-      margin: 8px 0;
-    }
-    .tab-btn {
-      background: #cbbd9a;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 40px;
-      font-weight: bold;
-      font-size: 0.9rem;
-      cursor: pointer;
-      box-shadow: 0 3px 0 #8b7652;
-      text-align: center;
-      flex: 1;
-    }
-    .tab-btn.active {
-      background: #9e8b64;
-      box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
-      transform: translateY(2px);
-      color: white;
-    }
-    .game-area {
-      display: flex;
-      gap: 12px;
-      margin: 8px 0;
-    }
-    .board-wrapper {
-      flex: 2;
-    }
-    .board {
-      display: grid;
-      gap: 2px;
-      background: #8a9b6e;
-      padding: 5px;
-      border-radius: 12px;
-      border: 2px solid #6b5a3e;
-    }
-    .board.my-board {
-      grid-template-columns: repeat(10, 1fr);
-      aspect-ratio: 10 / 10;
-    }
-    .board.full-map {
-      grid-template-columns: repeat(20, 1fr);
-      aspect-ratio: 20 / 10;
-    }
-    .cell {
-      background-color: #f5edda;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: inset 0 0 0 1px #e9dcbd;
-    }
+    .gold-display, .attack-display { background: #d9c9a8; border-radius: 30px; padding: 2px 10px; font-weight: bold; font-size: 0.9rem; }
+    .turn-indicator { background: #5d7a5c; color: white; padding: 5px 20px; border-radius: 40px; font-weight: bold; font-size: 1rem; text-align: center; }
+    .turn-counter { font-size: 0.7rem; background: #3d5a3c; border-radius: 30px; padding: 2px 8px; margin-top: 4px; }
+    .tab-bar { display: flex; gap: 8px; margin: 8px 0; }
+    .tab-btn { background: #cbbd9a; border: none; padding: 6px 12px; border-radius: 40px; font-weight: bold; font-size: 0.9rem; cursor: pointer; box-shadow: 0 3px 0 #8b7652; flex: 1; text-align: center; }
+    .tab-btn.active { background: #9e8b64; transform: translateY(2px); box-shadow: inset 0 2px 3px rgba(0,0,0,0.2); color: white; }
+    .game-area { display: flex; gap: 12px; margin: 8px 0; }
+    .board-wrapper { flex: 2; }
+    .board { display: grid; gap: 2px; background: #8a9b6e; padding: 5px; border-radius: 12px; border: 2px solid #6b5a3e; }
+    .board.my-board { grid-template-columns: repeat(10, 1fr); aspect-ratio: 10 / 10; }
+    .board.full-map { grid-template-columns: repeat(20, 1fr); aspect-ratio: 20 / 10; }
+    .cell { background-color: #f5edda; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: inset 0 0 0 1px #e9dcbd; transition: 0.03s linear; position: relative; }
+    .cell.attack-highlight { box-shadow: 0 0 0 2px red, inset 0 0 0 2px darkred; }
+    .cell.repair-highlight { box-shadow: 0 0 0 2px green, inset 0 0 0 2px darkgreen; }
     .cell.castle { background: #e0b072; }
     .cell.barracks { background: #c97e4a; }
     .cell.mine { background: #6f8f6b; }
@@ -131,611 +48,761 @@
     .cell.ash { background: #5a5a5a; color: #ccc; }
     .cell.ruins { background: #ab8e64; color: #3a2a1a; }
     .cell.fog { background: #5d6e5a; color: #b9cdb0; }
-    .info-panel {
-      flex: 1;
-      background: #f5eedb;
-      border-radius: 20px;
-      padding: 10px 12px;
-      border: 1px solid #dac292;
-      font-size: 0.8rem;
-      overflow-y: auto;
-      max-height: 400px;
-    }
-    .info-panel h3 {
-      text-align: center;
-      margin: 0 0 8px;
-      font-size: 1rem;
-    }
-    .building-card {
-      background: #fff9ef;
-      border-radius: 16px;
-      padding: 6px 8px;
-      margin: 8px 0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .building-icon { font-size: 1.6rem; min-width: 40px; text-align: center; }
-    .building-desc strong { color: #6b4c2c; }
-    .game-rules {
-      background: #e3d6bd;
-      border-radius: 16px;
-      padding: 8px;
-      margin-top: 10px;
-      font-size: 0.75rem;
-    }
-    .action-panel {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      background: #e3d6bd;
-      padding: 8px 12px;
-      border-radius: 40px;
-      margin: 8px 0;
-    }
-    .build-btn, .repair-btn {
-      background: #f5ebd2;
-      border: 1px solid #9b8a64;
-      padding: 4px 12px;
-      border-radius: 30px;
-      font-weight: bold;
-      font-size: 0.8rem;
-      cursor: pointer;
-      box-shadow: 0 2px 0 #8b7652;
-    }
+    .info-panel { flex: 1; background: #f5eedb; border-radius: 20px; padding: 10px; border: 1px solid #dac292; font-size: 0.8rem; overflow-y: auto; max-height: 400px; display: none; }
+    .action-panel { display: flex; gap: 8px; flex-wrap: wrap; background: #e3d6bd; padding: 8px 12px; border-radius: 40px; margin: 8px 0; align-items: center; }
+    .build-btn, .repair-btn { background: #f5ebd2; border: 1px solid #9b8a64; padding: 4px 12px; border-radius: 30px; font-weight: bold; font-size: 0.8rem; cursor: pointer; box-shadow: 0 2px 0 #8b7652; }
     .build-btn.disabled, .repair-btn.disabled { opacity: 0.5; pointer-events: none; }
-    .primary-btn {
-      background: #5c7c5a;
-      border: none;
-      color: white;
-      font-weight: bold;
-      padding: 6px 16px;
-      border-radius: 30px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      box-shadow: 0 2px 0 #2e4a2c;
-    }
-    .primary-btn:active { transform: translateY(2px); box-shadow: 0 0px 0 #2e4a2c; }
+    .primary-btn { background: #5c7c5a; border: none; color: white; padding: 6px 16px; border-radius: 30px; font-size: 0.85rem; cursor: pointer; box-shadow: 0 2px 0 #2e4a2c; }
+    .primary-btn:active { transform: translateY(2px); box-shadow: none; }
     .cancel-btn { background: #aa6f6f; box-shadow: 0 2px 0 #6e3a3a; }
-    .flex-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin: 5px 0; }
-    .status-message {
-      background: #e9dbbc;
-      border-radius: 30px;
-      padding: 5px 15px;
-      font-size: 0.8rem;
-      margin: 8px 0;
-    }
-    .pass-screen, .victory-screen {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: #1f2c36dd;
-      backdrop-filter: blur(4px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    .pass-card, .victory-card {
-      background: #fef0dc;
-      border-radius: 40px;
-      padding: 20px 30px;
-      text-align: center;
-      border: 4px solid #b8a172;
-    }
-    .game-footer {
-      margin-top: 10px;
-      text-align: center;
-      font-size: 0.75rem;
-      color: #4a3e2c;
-    }
-    .signature {
-      font-weight: bold;
-      background: linear-gradient(135deg, #c97e4a, #8b6b42);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      display: inline-block;
-    }
-    @media (max-width: 700px) {
-      .game-area { flex-direction: column; }
-      .cell { font-size: 10px; }
-    }
+    .flex-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin: 5px 0; align-items: center; }
+    .status-message { background: #e9dbbc; border-radius: 30px; padding: 5px 15px; font-size: 0.8rem; margin: 8px 0; }
+    .pass-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+    .pass-screen.active { opacity: 1; pointer-events: auto; }
+    .pass-card { background: #fef0dc; border-radius: 40px; padding: 20px 30px; text-align: center; border: 4px solid #b8a172; }
+    .victory-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1f2c36dd; backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+    .victory-card { background: #fef0dc; border-radius: 40px; padding: 20px 30px; text-align: center; border: 4px solid #b8a172; }
+    .game-footer { margin-top: 10px; text-align: center; font-size: 0.7rem; color: #4a3e2c; display: flex; justify-content: space-between; flex-wrap: wrap; }
+    .signature { font-weight: bold; background: linear-gradient(135deg, #c97e4a, #8b6b42); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    @media (max-width: 700px) { .game-area { flex-direction: column; } .cell { font-size: 10px; } }
   </style>
 </head>
 <body>
-<div class="game-container">
-  <h1>⚔️ ОСАДА НА БУМАГЕ ⚔️</h1>
-  <div class="players-panel">
-    <div class="player-badge"><div class="player-name">🧑‍🌾 Игрок 1</div><div class="resources"><span class="gold-display" id="p1-gold">💰 5</span><span class="attack-display" id="p1-attacks">⚔️ 0</span></div></div>
-    <div class="turn-indicator" id="turn-indicator">🔵 Ход 1</div>
-    <div class="player-badge"><div class="player-name">👑 Игрок 2</div><div class="resources"><span class="gold-display" id="p2-gold">💰 ?</span><span class="attack-display" id="p2-attacks">⚔️ ?</span></div></div>
+<!-- МЕНЮ -->
+<div id="menu-container" class="menu-container">
+  <h1 class="menu-title" data-i18n="gameTitle">⚔️ ОСАДА НА БУМАГЕ ⚔️</h1>
+  <div class="menu-buttons">
+    <button class="menu-btn" id="btn-play2p" data-i18n="play2p">👥 2 игрока (локально)</button>
+    <button class="menu-btn" id="btn-playOnline" data-i18n="playOnline">🌐 Онлайн (скоро)</button>
+    <button class="menu-btn" id="btn-playAI" data-i18n="playAI">🤖 Против компьютера (скоро)</button>
+    <button class="menu-btn small" id="btn-encyclopedia" data-i18n="encyclopedia">📖 Энциклопедия</button>
+    <button class="menu-btn small" id="btn-settings" data-i18n="settings">⚙️ Настройки</button>
   </div>
-  <div class="tab-bar">
-    <div class="tab-btn active" data-tab="base">🏠 Моё поле</div>
-    <div class="tab-btn" data-tab="map">🗺️ Карта разведки</div>
-    <div class="tab-btn" data-tab="encyclopedia">📖 Энциклопедия</div>
+  <!-- ЭНЦИКЛОПЕДИЯ -->
+  <div id="encyclopedia-panel" class="encyclopedia-panel hidden">
+    <h3 data-i18n="encyclopediaTitle">📖 Энциклопедия</h3>
+    <div data-i18n="encContent"></div>
+    <button class="menu-btn small" id="close-encyclopedia" data-i18n="close">Закрыть</button>
   </div>
-  <div class="game-area" id="game-area">
-    <div class="board-wrapper" id="board-wrapper">
-      <div class="board" id="board"></div>
-    </div>
-    <div class="info-panel" id="info-panel" style="display: none;"></div>
+  <!-- НАСТРОЙКИ -->
+  <div id="settings-panel" class="settings-panel hidden">
+    <h3 data-i18n="settingsTitle">Настройки</h3>
+    <div class="setting-row"><span data-i18n="soundLabel">🔊 Звук:</span> <button id="toggle-sound" class="setting-btn">Вкл</button></div>
+    <div class="setting-row"><span data-i18n="languageLabel">🌐 Язык:</span> <select id="language-select"><option value="ru">Русский</option><option value="en">English</option></select></div>
+    <div class="setting-row"><span data-i18n="themeLabel">🎨 Тема:</span> <select id="theme-select"><option value="light">Светлая</option><option value="dark">Тёмная</option></select></div>
+    <button class="menu-btn small" id="close-settings" data-i18n="close">Закрыть</button>
   </div>
-  <div class="status-message" id="status-msg">⚡ Расстановка: замок + до 15 построек (БЕСПЛАТНО)</div>
-  <div class="action-panel">
-    <button class="build-btn" data-type="castle">🏰 Замок</button>
-    <button class="build-btn" data-type="barracks">⚔️ Казарма</button>
-    <button class="build-btn" data-type="mine">⛏️ Рудник</button>
-    <button class="build-btn" data-type="farm">🌾 Ферма</button>
-    <button class="build-btn" data-type="wall">🧱 Стена</button>
-    <button class="repair-btn" id="repair-btn">🔧 Ремонт (1💰)</button>
-  </div>
-  <div class="flex-row">
-    <div style="display: flex; gap: 8px;">
-      <button class="primary-btn" id="attack-mode-btn">⚔️ Атака</button>
-      <button class="primary-btn cancel-btn" id="cancel-attack-btn">🚫 Отмена</button>
-      <button class="primary-btn" id="pass-turn-btn">🔄 Завершить ход</button>
-    </div>
-  </div>
-  <div class="game-footer"><span>🧠 Стратегия: если у врага рудников &lt;2, можно построить третий. Атака всегда тратит полк. В расстановке клик по зданию (кроме замка) — удалить.</span> &nbsp; | &nbsp; <span class="signature">by Ardelord79</span></div>
 </div>
-<div class="pass-screen" id="pass-screen" style="display:none"><div class="pass-card"><h2>📋 Ход завершён</h2><p id="next-player-label"></p><button id="confirm-pass-btn">▶ Продолжить</button></div></div>
-<div class="victory-screen" id="victory-screen" style="display:none"><div class="victory-card"><h2 id="victory-message"></h2><button id="restart-btn">🔄 Новая игра</button></div></div>
+
+<!-- ИГРОВОЙ КОНТЕЙНЕР -->
+<div id="game-container" class="game-container hidden"></div>
 
 <script>
   (function(){
     "use strict";
-    const COLS = 20, ROWS = 10;
-    const getPlayerZone = col => col < 10 ? 0 : 1;
-    let board = Array(ROWS).fill().map(() => Array(COLS).fill(null));
-    let ash = Array(ROWS).fill().map(() => Array(COLS).fill(false));
-    let revealed = [ Array(ROWS).fill().map(() => Array(COLS).fill(false)), Array(ROWS).fill().map(() => Array(COLS).fill(false)) ];
-    let players = [{ id:0, name:'Игрок 1', gold:5 }, { id:1, name:'Игрок 2', gold:5 }];
-    let currentPlayer = 0, phase = 'setup', setupBuildingsPlaced = [0,0];
-    const MAX_BUILDINGS = 15, BASE_MINE_LIMIT = 2, BUILD_COST = 2, REPAIR_COST = 1, CASTLE_MAX_HP = 4;
-    let attackModeActive = false, repairModeActive = false, attacksRemaining = 0, currentTab = 'base';
-    
-    function getMineLimit(playerId) {
-      const enemyId = playerId === 0 ? 1 : 0;
-      let enemyMines = 0;
-      for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) {
-        const cell = board[r][c];
-        if(cell && cell.owner === enemyId && cell.type === 'mine' && !cell.ruined) enemyMines++;
+
+    // ----------------------------- ПОЛНЫЕ ПЕРЕВОДЫ -----------------------------
+    const translations = {
+      ru: {
+        gameTitle: "⚔️ ОСАДА НА БУМАГЕ ⚔️",
+        play2p: "👥 2 игрока (локально)",
+        playOnline: "🌐 Онлайн (скоро)",
+        playAI: "🤖 Против компьютера (скоро)",
+        encyclopedia: "📖 Энциклопедия",
+        settings: "⚙️ Настройки",
+        close: "Закрыть",
+        settingsTitle: "Настройки",
+        soundLabel: "🔊 Звук:",
+        languageLabel: "🌐 Язык:",
+        themeLabel: "🎨 Тема:",
+        soon: "🚧 Режим в разработке 🚧",
+        encyclopediaTitle: "📖 Энциклопедия",
+        castleName: "Замок",
+        castleDesc: "4 HP. Потеря = поражение.",
+        barracksName: "Казарма",
+        farmName: "Ферма",
+        regimentsDesc: "дают 1 полк (атаку) за каждую пару.",
+        mineName: "Рудник",
+        mineDescShort: "+1💰 в конце хода (макс.5). Лимит: 2, +1 если у врага <2 рабочих рудников.",
+        wallName: "Стена",
+        wallDescShort: "блокирует одну атаку по горизонтали, разрушаясь.",
+        goldTitle: "Золото",
+        goldDesc: "нужно для строительства (2💰) и ремонта (1💰) в бою. В расстановке всё бесплатно.",
+        attacksTitle: "Полки",
+        attacksDesc: "количество атак за ход. Каждая атака расходует полк, даже по пустой клетке.",
+        fogTitle: "ТУМАН ВОЙНЫ",
+        fogDesc: "вы не видите постройки противника, пока не атакуете клетку или не разрушите стену на пути. Разрушенные здания и пепел видны всем.",
+        ruinsTitle: "Руины → пепел",
+        ruinsDesc: "через один полный ход руины превращаются в пепел, освобождая место.",
+        player1: "Игрок 1",
+        player2: "Игрок 2",
+        gold: "💰",
+        attacks: "⚔️",
+        turn: "ход",
+        setupMsg: (cnt, max) => `🏗️ Расстановка: замок + ${cnt}/${max} (клик по зданию — удалить)`,
+        statusAction: (gold, regiments, attackInfo) => `⚔️ Золото: ${gold} | Полки: ${regiments}${attackInfo}`,
+        turnIndicator: (p) => (p===0?'🔵 Игрок 1':'🔴 Игрок 2') + ' ходит',
+        buildCastle: "🏰 Замок",
+        buildBarracks: "⚔️ Казарма",
+        buildMine: "⛏️ Рудник",
+        buildFarm: "🌾 Ферма",
+        buildWall: "🧱 Стена",
+        repair: "🔧 Ремонт (1💰)",
+        attack: "⚔️ Атака",
+        cancel: "🚫 Отмена",
+        endTurn: "🔄 Завершить ход",
+        myField: "🏠 Моё поле",
+        map: "🗺️ Карта разведки",
+        encyclopediaTab: "📖 Энциклопедия",
+        passScreen: "Передайте устройство",
+        victory: "Победил! Замок пал.",
+      },
+      en: {
+        gameTitle: "⚔️ SIEGE ON PAPER ⚔️",
+        play2p: "👥 2 players (local)",
+        playOnline: "🌐 Online (coming soon)",
+        playAI: "🤖 vs Computer (coming soon)",
+        encyclopedia: "📖 Encyclopedia",
+        settings: "⚙️ Settings",
+        close: "Close",
+        settingsTitle: "Settings",
+        soundLabel: "🔊 Sound:",
+        languageLabel: "🌐 Language:",
+        themeLabel: "🎨 Theme:",
+        soon: "🚧 Under development 🚧",
+        encyclopediaTitle: "📖 Encyclopedia",
+        castleName: "Castle",
+        castleDesc: "4 HP. Loss = defeat.",
+        barracksName: "Barracks",
+        farmName: "Farm",
+        regimentsDesc: "provide 1 regiment (attack) per pair.",
+        mineName: "Mine",
+        mineDescShort: "+1💰 at end of turn (max 5). Limit: 2, +1 if enemy has <2 working mines.",
+        wallName: "Wall",
+        wallDescShort: "blocks one horizontal attack, then destroyed.",
+        goldTitle: "Gold",
+        goldDesc: "needed for building (2💰) and repair (1💰) in battle. Free during setup.",
+        attacksTitle: "Regiments",
+        attacksDesc: "number of attacks per turn. Each attack consumes a regiment, even on empty cells.",
+        fogTitle: "FOG OF WAR",
+        fogDesc: "you cannot see enemy buildings until you attack the cell or destroy a wall in the path. Ruins and ash are visible to all.",
+        ruinsTitle: "Ruins → ash",
+        ruinsDesc: "after one full turn, ruins turn into ash, freeing the cell.",
+        player1: "Player 1",
+        player2: "Player 2",
+        gold: "💰",
+        attacks: "⚔️",
+        turn: "turn",
+        setupMsg: (cnt, max) => `🏗️ Setup: castle + ${cnt}/${max} (click building to delete)`,
+        statusAction: (gold, regiments, attackInfo) => `⚔️ Gold: ${gold} | Regiments: ${regiments}${attackInfo}`,
+        turnIndicator: (p) => (p===0?'🔵 Player 1':'🔴 Player 2') + ' turn',
+        buildCastle: "🏰 Castle",
+        buildBarracks: "⚔️ Barracks",
+        buildMine: "⛏️ Mine",
+        buildFarm: "🌾 Farm",
+        buildWall: "🧱 Wall",
+        repair: "🔧 Repair (1💰)",
+        attack: "⚔️ Attack",
+        cancel: "🚫 Cancel",
+        endTurn: "🔄 End turn",
+        myField: "🏠 My field",
+        map: "🗺️ Recon map",
+        encyclopediaTab: "📖 Encyclopedia",
+        passScreen: "Pass the device to",
+        victory: "Victory! Enemy castle destroyed.",
       }
-      return BASE_MINE_LIMIT + (enemyMines < 2 ? 1 : 0);
-    }
-    
-    function countBuildingsOfType(playerId, type, onlyWorking=true){
-      let cnt=0;
-      for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
-        const cell=board[r][c];
-        if(cell && cell.owner===playerId && cell.type===type && (!onlyWorking || !cell.ruined)) cnt++;
-      }
-      return cnt;
-    }
-    function countAllPlayerBuildings(playerId){
-      let cnt=0;
-      for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
-        const cell=board[r][c];
-        if(cell && cell.owner===playerId && !cell.ruined) cnt++;
-      }
-      return cnt;
-    }
-    function hasCastle(playerId){
-      for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
-        const cell=board[r][c];
-        if(cell && cell.owner===playerId && cell.type==='castle' && !cell.ruined) return true;
-      }
-      return false;
-    }
-    function collectIncome(playerId){
-      const mines = countBuildingsOfType(playerId, 'mine');
-      players[playerId].gold = Math.min(5, players[playerId].gold + mines);
-    }
-    function getAvailableRegiments(playerId){
-      return Math.min(countBuildingsOfType(playerId,'barracks'), countBuildingsOfType(playerId,'farm'));
-    }
-    function showVictory(winnerId){
-      document.getElementById('victory-message').innerText = `🏆 ${players[winnerId].name} победил! Замок пал. 🏆`;
-      document.getElementById('victory-screen').style.display = 'flex';
-    }
-    function checkGameOver(){
-      if(phase!=='action') return false;
-      for(let p=0;p<2;p++) if(!hasCastle(p)){ showVictory(p===0?1:0); return true; }
-      return false;
-    }
-    function revealCell(row,col){ revealed[0][row][col]=revealed[1][row][col]=true; }
-    function turnRuinsToAsh(row,col){
-      const cell=board[row][col];
-      if(cell && cell.ruined){ board[row][col]=null; ash[row][col]=true; revealCell(row,col); }
-    }
-    function processRuinsForAll(){
-      for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
-        const cell=board[r][c];
-        if(cell && cell.ruined){
-          if(cell.ruinTimer===1) turnRuinsToAsh(r,c);
-          else cell.ruinTimer=1;
-        }
-      }
-    }
-    function destroyBuilding(row,col){
-      const cell=board[row][col];
-      if(!cell) return false;
-      if(cell.type==='castle'){
-        cell.hp = (cell.hp||CASTLE_MAX_HP)-1;
-        if(cell.hp<=0){ board[row][col]=null; ash[row][col]=true; revealCell(row,col); return true; }
-        return false;
-      }else{
-        cell.ruined=true; cell.hp=0; cell.ruinTimer=0; revealCell(row,col); return true;
-      }
-    }
-    function performAttack(targetRow, targetCol){
-      const playerId=currentPlayer, enemyId=playerId===0?1:0;
-      if(getPlayerZone(targetCol)===playerId) return { success:false, costAttack:true, reason:'Нельзя атаковать свою территорию (полк погиб)' };
-      const startCol=playerId===0?9:10, step=targetCol>startCol?1:-1;
-      for(let c=startCol+step; c!==targetCol; c+=step){
-        if(c<0||c>=COLS) return { success:false, costAttack:true, reason:'Выход за границы' };
-        const cell=board[targetRow][c];
-        if(cell && cell.owner===enemyId && !cell.ruined && cell.type==='wall'){
-          revealCell(targetRow,c);
-          cell.ruined=true; cell.ruinTimer=0;
-          return { success:false, costAttack:true, reason:'🧱 Стена разрушена, отряд погиб' };
-        }
-      }
-      const targetCell=board[targetRow][targetCol];
-      if(!targetCell){
-        revealCell(targetRow,targetCol);
-        return { success:false, costAttack:true, reason:'Пустошь — разведка стоила жизни' };
-      }
-      if(targetCell.owner===playerId) return { success:false, costAttack:true, reason:'Вы атаковали своё здание (бессмысленно, но полк погиб)' };
-      if(targetCell.ruined) return { success:false, costAttack:true, reason:'Руины — полк погиб впустую' };
-      revealCell(targetRow,targetCol);
-      const destroyed=destroyBuilding(targetRow,targetCol);
-      if(targetCell.type==='castle' && targetCell.hp>0) return { success:true, costAttack:true, reason:`🏰 Замок атакован! Осталось ${targetCell.hp} HP` };
-      return { success:true, costAttack:true, reason:destroyed?'Здание разрушено':'Атака успешна' };
-    }
-    
-    function renderBoard(){
-      const boardEl = document.getElementById('board');
-      const infoPanel = document.getElementById('info-panel');
-      const isBaseTab = (currentTab === 'base');
-      const isEncyclopedia = (currentTab === 'encyclopedia');
-      
-      if(isEncyclopedia){
-        boardEl.style.display = 'none';
-        infoPanel.style.display = 'block';
-        infoPanel.innerHTML = `
-          <h3>📖 Энциклопедия зданий</h3>
-          <div class="building-card"><div class="building-icon">🏰</div><div class="building-desc"><strong>Замок</strong> — 4 HP. Если разрушен — поражение. Строится один раз бесплатно.</div></div>
-          <div class="building-card"><div class="building-icon">⚔️</div><div class="building-desc"><strong>Казарма</strong> — даёт 1 полк (вместе с фермой). Нужна для атак.</div></div>
-          <div class="building-card"><div class="building-icon">🌾</div><div class="building-desc"><strong>Ферма</strong> — даёт 1 полк (вместе с казармой).</div></div>
-          <div class="building-card"><div class="building-icon">⛏️</div><div class="building-desc"><strong>Рудник</strong> — приносит золото (1-5 в ход, не более 5). Лимит 2 + бонус если у врага <2 рудников.</div></div>
-          <div class="building-card"><div class="building-icon">🧱</div><div class="building-desc"><strong>Стена</strong> — преграда. Полк погибает, стена рушится.</div></div>
-          <div class="game-rules">
-            <strong>🎯 Цель:</strong> уничтожить замок врага.<br>
-            <strong>⚡ Атака:</strong> одна атака = один полк (тратится всегда). Атаки = min(казармы, фермы).<br>
-            <strong>💰 Доход:</strong> в конце хода +рудники (не более 5 золота).<br>
-            <strong>🏚️ Руины → пепел:</strong> через 1 полный ход освобождают место.<br>
-            <strong>🔄 Расстановка:</strong> бесплатно 15 зданий + замок. Клик по зданию (кроме замка) — удалить.<br>
-            <strong>🔧 Ремонт:</strong> 1 золото восстанавливает здание (замку +1 HP).<br>
-            <strong>🧠 Бонус:</strong> если у врага рудников < 2, вы можете построить третий рудник.
-          </div>
+    };
+
+    let currentLang = 'ru';
+    let soundEnabled = true;
+    let currentTheme = 'light';
+    let gameInitialized = false;
+
+    const menuDiv = document.getElementById('menu-container');
+    const gameDiv = document.getElementById('game-container');
+    const encPanel = document.getElementById('encyclopedia-panel');
+    const setPanel = document.getElementById('settings-panel');
+
+    function updateEncContent() {
+      const t = translations[currentLang];
+      const encDiv = document.querySelector('#encyclopedia-panel [data-i18n="encContent"]');
+      if (encDiv) {
+        encDiv.innerHTML = `
+          <p><strong>🏰 ${t.castleName}</strong> – ${t.castleDesc}</p>
+          <p><strong>⚔️ ${t.barracksName} + 🌾 ${t.farmName}</strong> – ${t.regimentsDesc}</p>
+          <p><strong>⛏️ ${t.mineName}</strong> – ${t.mineDescShort}</p>
+          <p><strong>🧱 ${t.wallName}</strong> – ${t.wallDescShort}</p>
+          <p><strong>💰 ${t.goldTitle}</strong> – ${t.goldDesc}</p>
+          <p><strong>⚔️ ${t.attacksTitle}</strong> – ${t.attacksDesc}</p>
+          <p><strong>🌫️ ${t.fogTitle}</strong> – ${t.fogDesc}</p>
+          <p><strong>💀 ${t.ruinsTitle}</strong> – ${t.ruinsDesc}</p>
         `;
-        return;
-      } else {
-        boardEl.style.display = 'grid';
       }
-      
-      if(isBaseTab){
-        infoPanel.style.display = 'none';
-        boardEl.className = 'board my-board';
-        let startCol, endCol;
-        if(currentPlayer === 0){ startCol = 0; endCol = 10; }
-        else { startCol = 10; endCol = 20; }
-        boardEl.innerHTML = '';
-        for(let r=0; r<ROWS; r++){
-          for(let c=startCol; c<endCol; c++){
-            const cell = board[r][c];
-            const isAsh = ash[r][c];
-            const div = document.createElement('div');
-            div.className = 'cell';
-            let symbol = '', cls = '';
-            if(isAsh){ symbol='✖️'; cls='ash'; }
-            else if(cell){
-              if(cell.ruined){ symbol='💀'; cls='ruins'; }
-              else{
-                switch(cell.type){
-                  case 'castle': symbol='🏰'; cls='castle'; if(cell.hp) symbol+=cell.hp; break;
-                  case 'barracks': symbol='⚔️'; cls='barracks'; break;
-                  case 'mine': symbol='⛏️'; cls='mine'; break;
-                  case 'farm': symbol='🌾'; cls='farm'; break;
-                  case 'wall': symbol='🧱'; cls='wall'; break;
+    }
+
+    function applyLanguage() {
+      const t = translations[currentLang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (key === 'encContent') return;
+        if (t[key] && typeof t[key] === 'string') el.innerText = t[key];
+      });
+      updateEncContent();
+      if (window.gameLocalize) window.gameLocalize(t);
+    }
+
+    function applyTheme() {
+      document.body.classList.toggle('dark', currentTheme === 'dark');
+    }
+
+    document.getElementById('language-select').addEventListener('change', e => {
+      currentLang = e.target.value;
+      applyLanguage();
+    });
+    document.getElementById('theme-select').addEventListener('change', e => {
+      currentTheme = e.target.value;
+      applyTheme();
+    });
+    const soundBtn = document.getElementById('toggle-sound');
+    soundBtn.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      soundBtn.innerText = soundEnabled ? (currentLang==='ru'?'Вкл':'On') : (currentLang==='ru'?'Выкл':'Off');
+      if (window.gameSetSound) window.gameSetSound(soundEnabled);
+    });
+
+    document.getElementById('btn-encyclopedia').addEventListener('click', () => {
+      encPanel.classList.toggle('hidden');
+      setPanel.classList.add('hidden');
+      updateEncContent();
+    });
+    document.getElementById('close-encyclopedia').addEventListener('click', () => encPanel.classList.add('hidden'));
+    document.getElementById('btn-settings').addEventListener('click', () => {
+      setPanel.classList.toggle('hidden');
+      encPanel.classList.add('hidden');
+    });
+    document.getElementById('close-settings').addEventListener('click', () => setPanel.classList.add('hidden'));
+
+    function showSoon() { alert(translations[currentLang].soon); }
+    document.getElementById('btn-playOnline').addEventListener('click', showSoon);
+    document.getElementById('btn-playAI').addEventListener('click', showSoon);
+
+    document.getElementById('btn-play2p').addEventListener('click', () => {
+      menuDiv.classList.add('hidden');
+      gameDiv.classList.remove('hidden');
+      if (!gameInitialized) {
+        initGameHTML();
+        initGameScript();
+        gameInitialized = true;
+        applyLanguage();
+      } else {
+        if (window.gameReset) window.gameReset();
+        else location.reload();
+      }
+    });
+
+    function initGameHTML() {
+      gameDiv.innerHTML = `
+        <h1 data-i18n="gameTitle">⚔️ ОСАДА НА БУМАГЕ ⚔️</h1>
+        <div class="players-panel">
+          <div class="player-badge"><div class="player-name" id="p1-name">🧑‍🌾 Игрок 1</div><div class="resources"><span class="gold-display" id="p1-gold">💰 5</span><span class="attack-display" id="p1-attacks">⚔️ 0</span></div></div>
+          <div class="turn-indicator"><div id="turn-indicator-text">🔵 Ход 1</div><div class="turn-counter" id="turn-counter">📊 Ходов: 0</div></div>
+          <div class="player-badge"><div class="player-name" id="p2-name">👑 Игрок 2</div><div class="resources"><span class="gold-display" id="p2-gold">💰 ?</span><span class="attack-display" id="p2-attacks">⚔️ ?</span></div></div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab-btn active" data-tab="base" data-i18n="myField">🏠 Моё поле</div>
+          <div class="tab-btn" data-tab="map" data-i18n="map">🗺️ Карта разведки</div>
+          <div class="tab-btn" data-tab="encyclopedia" data-i18n="encyclopediaTab">📖 Энциклопедия</div>
+        </div>
+        <div class="game-area"><div class="board-wrapper"><div class="board" id="board"></div></div><div class="info-panel" id="info-panel"></div></div>
+        <div class="status-message" id="status-msg"></div>
+        <div class="action-panel">
+          <button class="build-btn" data-type="castle" data-i18n="buildCastle">🏰 Замок</button>
+          <button class="build-btn" data-type="barracks" data-i18n="buildBarracks">⚔️ Казарма</button>
+          <button class="build-btn" data-type="mine" data-i18n="buildMine">⛏️ Рудник</button>
+          <button class="build-btn" data-type="farm" data-i18n="buildFarm">🌾 Ферма</button>
+          <button class="build-btn" data-type="wall" data-i18n="buildWall">🧱 Стена</button>
+          <button class="repair-btn" id="repair-btn" data-i18n="repair">🔧 Ремонт (1💰)</button>
+        </div>
+        <div class="flex-row"><div style="display: flex; gap: 8px;"><button class="primary-btn" id="attack-mode-btn" data-i18n="attack">⚔️ Атака</button><button class="primary-btn cancel-btn" id="cancel-attack-btn" data-i18n="cancel">🚫 Отмена</button><button class="primary-btn" id="pass-turn-btn" data-i18n="endTurn">🔄 Завершить ход</button></div></div>
+        <div class="game-footer"><span>🧠 Стратегия: у врага &lt;2 рудников → можно построить 3-й. Атака всегда тратит полк. В расстановке клик по зданию (кроме замка) — удалить.</span> <span class="signature">by Ardelord79</span></div>
+        <div class="pass-screen" id="pass-screen"><div class="pass-card"><h2>📋 Ход завершён</h2><p id="next-player-label"></p><button id="confirm-pass-btn">▶ Продолжить</button></div></div>
+        <div class="victory-screen" id="victory-screen" style="display:none"><div class="victory-card"><h2 id="victory-message"></h2><button id="restart-btn">🔄 Новая игра</button></div></div>
+      `;
+    }
+
+    function initGameScript() {
+      const script = document.createElement('script');
+      script.textContent = `
+        (function(){
+          "use strict";
+
+          const COLS = 20, ROWS = 10;
+          const getZone = col => col < 10 ? 0 : 1;
+          const MAX_BUILDINGS = 15;
+          const BASE_MINE_LIMIT = 2;
+          const BUILD_COST = 2;
+          const REPAIR_COST = 1;
+          const CASTLE_MAX_HP = 4;
+
+          let board = Array(ROWS).fill().map(() => Array(COLS).fill(null));
+          let ash = Array(ROWS).fill().map(() => Array(COLS).fill(false));
+          let revealed = [
+            Array(ROWS).fill().map(() => Array(COLS).fill(false)),
+            Array(ROWS).fill().map(() => Array(COLS).fill(false))
+          ];
+          let players = [{id:0, gold:5}, {id:1, gold:5}];
+          let currentPlayer = 0;
+          let phase = 'setup';
+          let totalTurns = 0;
+
+          let attackModeActive = false;
+          let repairModeActive = false;
+          let attacksRemaining = 0;
+          let currentTab = 'base';
+
+          let soundEnabled = true;
+          let currentTranslations = null;
+
+          function playSound(type) { if (!soundEnabled) return; }
+
+          function getMineLimit(p) {
+            let enemy = p === 0 ? 1 : 0;
+            let enemyMines = 0;
+            for (let r=0; r<ROWS; r++) for (let c=0; c<COLS; c++) {
+              let cell = board[r][c];
+              if (cell && cell.owner === enemy && cell.type === 'mine' && !cell.ruined) enemyMines++;
+            }
+            return BASE_MINE_LIMIT + (enemyMines < 2 ? 1 : 0);
+          }
+          function countType(p, type, onlyWorking = true) {
+            let cnt = 0;
+            for (let r=0; r<ROWS; r++) for (let c=0; c<COLS; c++) {
+              let cell = board[r][c];
+              if (cell && cell.owner === p && cell.type === type && (!onlyWorking || !cell.ruined)) cnt++;
+            }
+            return cnt;
+          }
+          function countAll(p) {
+            let cnt = 0;
+            for (let r=0; r<ROWS; r++) for (let c=0; c<COLS; c++) {
+              let cell = board[r][c];
+              if (cell && cell.owner === p && !cell.ruined) cnt++;
+            }
+            return cnt;
+          }
+          function hasCastle(p) {
+            for (let r=0; r<ROWS; r++) for (let c=0; c<COLS; c++) {
+              let cell = board[r][c];
+              if (cell && cell.owner === p && cell.type === 'castle' && !cell.ruined) return true;
+            }
+            return false;
+          }
+          function collectIncome(p) {
+            let mines = countType(p, 'mine');
+            players[p].gold = Math.min(5, players[p].gold + mines);
+          }
+          function getRegiments(p) {
+            let b = countType(p, 'barracks');
+            let f = countType(p, 'farm');
+            return Math.min(b, f);
+          }
+          function revealCell(r, c) { revealed[0][r][c] = revealed[1][r][c] = true; }
+          
+          function turnRuinsToAsh(r, c) {
+            let cell = board[r][c];
+            if (cell && cell.ruined) {
+              board[r][c] = null;
+              ash[r][c] = true;
+              revealCell(r, c);
+            }
+          }
+          function processRuins() {
+            for (let r=0; r<ROWS; r++) for (let c=0; c<COLS; c++) {
+              let cell = board[r][c];
+              if (cell && cell.ruined) {
+                if (cell.ruinTimer === 1) turnRuinsToAsh(r, c);
+                else cell.ruinTimer = 1;
+              }
+            }
+          }
+          function destroyBuilding(r, c) {
+            let cell = board[r][c];
+            if (!cell) return false;
+            if (cell.type === 'castle') {
+              cell.hp = (cell.hp || CASTLE_MAX_HP) - 1;
+              if (cell.hp <= 0) {
+                board[r][c] = null;
+                ash[r][c] = true;
+                revealCell(r, c);
+                return true;
+              }
+              return false;
+            } else {
+              cell.ruined = true;
+              cell.hp = 0;
+              cell.ruinTimer = 0;
+              revealCell(r, c);
+              return true;
+            }
+          }
+          function performAttack(r, c) {
+            let p = currentPlayer, enemy = 1-p;
+            if (getZone(c) === p) return { cost: true, reason: 'Нельзя атаковать свою территорию' };
+            let start = p === 0 ? 9 : 10;
+            let step = c > start ? 1 : -1;
+            for (let col = start + step; col !== c; col += step) {
+              if (col < 0 || col >= COLS) return { cost: true, reason: 'Выход за границы' };
+              let cell = board[r][col];
+              if (cell && cell.owner === enemy && !cell.ruined && cell.type === 'wall') {
+                revealCell(r, col);
+                cell.ruined = true;
+                cell.ruinTimer = 0;
+                return { cost: true, reason: 'Стена разрушена' };
+              }
+            }
+            let target = board[r][c];
+            if (!target) { revealCell(r, c); return { cost: true, reason: 'Пустошь' }; }
+            if (target.owner === p) return { cost: true, reason: 'Своё здание' };
+            if (target.ruined) return { cost: true, reason: 'Руины' };
+            revealCell(r, c);
+            destroyBuilding(r, c);
+            return { cost: true, reason: 'Атака' };
+          }
+
+          function renderBoard() {
+            const boardEl = document.getElementById('board');
+            const infoPanel = document.getElementById('info-panel');
+            const isBase = (currentTab === 'base');
+            const isEnc = (currentTab === 'encyclopedia');
+
+            if (isEnc) {
+              boardEl.style.display = 'none';
+              infoPanel.style.display = 'block';
+              const t = currentTranslations || translations.ru;
+              infoPanel.innerHTML = \`<h3>\${t.encyclopediaTab}</h3>
+                <p><strong>🏰 \${t.castleName}</strong> – \${t.castleDesc}</p>
+                <p><strong>⚔️ \${t.barracksName} + 🌾 \${t.farmName}</strong> – \${t.regimentsDesc}</p>
+                <p><strong>⛏️ \${t.mineName}</strong> – \${t.mineDescShort}</p>
+                <p><strong>🧱 \${t.wallName}</strong> – \${t.wallDescShort}</p>
+                <p><strong>💰 \${t.goldTitle}</strong> – \${t.goldDesc}</p>
+                <p><strong>⚔️ \${t.attacksTitle}</strong> – \${t.attacksDesc}</p>
+                <p><strong>🌫️ \${t.fogTitle}</strong> – \${t.fogDesc}</p>
+                <p><strong>💀 \${t.ruinsTitle}</strong> – \${t.ruinsDesc}</p>\`;
+              return;
+            } else {
+              boardEl.style.display = 'grid';
+              infoPanel.style.display = 'none';
+            }
+
+            if (isBase) {
+              boardEl.className = 'board my-board';
+              let start = currentPlayer === 0 ? 0 : 10;
+              let end = start + 10;
+              boardEl.innerHTML = '';
+              for (let r=0; r<ROWS; r++) {
+                for (let c=start; c<end; c++) {
+                  let cell = board[r][c], isAsh = ash[r][c];
+                  let div = document.createElement('div'); div.className = 'cell';
+                  let sym = '', cls = '';
+                  if (isAsh) { sym = '✖️'; cls = 'ash'; }
+                  else if (cell) {
+                    if (cell.ruined) { sym = '💀'; cls = 'ruins'; }
+                    else {
+                      switch (cell.type) {
+                        case 'castle': sym = '🏰' + (cell.hp||''); cls = 'castle'; break;
+                        case 'barracks': sym = '⚔️'; cls = 'barracks'; break;
+                        case 'mine': sym = '⛏️'; cls = 'mine'; break;
+                        case 'farm': sym = '🌾'; cls = 'farm'; break;
+                        case 'wall': sym = '🧱'; cls = 'wall'; break;
+                      }
+                    }
+                  }
+                  div.textContent = sym;
+                  if (cls) div.classList.add(cls);
+                  if (repairModeActive && cell && cell.owner === currentPlayer && (cell.ruined || (cell.type==='castle' && cell.hp<CASTLE_MAX_HP)))
+                    div.classList.add('repair-highlight');
+                  div.addEventListener('click', (function(r,c){ return ()=>handleCellClick(r, c-start); })(r,c));
+                  boardEl.appendChild(div);
+                }
+              }
+            } else {
+              boardEl.className = 'board full-map';
+              boardEl.innerHTML = '';
+              for (let r=0; r<ROWS; r++) {
+                for (let c=0; c<COLS; c++) {
+                  let cell = board[r][c], isAsh = ash[r][c];
+                  let visible = revealed[currentPlayer][r][c];
+                  let div = document.createElement('div'); div.className = 'cell';
+                  let sym = '', cls = '';
+                  if (!visible) { sym = '🌫️'; cls = 'fog'; }
+                  else if (isAsh) { sym = '✖️'; cls = 'ash'; }
+                  else if (cell) {
+                    if (cell.ruined) { sym = '💀'; cls = 'ruins'; }
+                    else {
+                      switch (cell.type) {
+                        case 'castle': sym = '🏰' + (cell.hp||''); cls = 'castle'; break;
+                        case 'barracks': sym = '⚔️'; cls = 'barracks'; break;
+                        case 'mine': sym = '⛏️'; cls = 'mine'; break;
+                        case 'farm': sym = '🌾'; cls = 'farm'; break;
+                        case 'wall': sym = '🧱'; cls = 'wall'; break;
+                      }
+                    }
+                  }
+                  div.textContent = sym;
+                  if (cls) div.classList.add(cls);
+                  if (attackModeActive && visible && cell && cell.owner !== currentPlayer && !cell.ruined)
+                    div.classList.add('attack-highlight');
+                  div.addEventListener('click', (function(r,c){ return ()=>handleCellClick(r,c); })(r,c));
+                  boardEl.appendChild(div);
                 }
               }
             }
-            div.textContent = symbol;
-            if(cls) div.classList.add(cls);
-            div.addEventListener('click', (function(row,col){ return function(){ handleCellClick(row,col); }; })(r,c-startCol));
-            boardEl.appendChild(div);
           }
-        }
-      } else {
-        infoPanel.style.display = 'none';
-        boardEl.className = 'board full-map';
-        boardEl.innerHTML = '';
-        for(let r=0; r<ROWS; r++){
-          for(let c=0; c<COLS; c++){
-            const cell = board[r][c];
-            const isAsh = ash[r][c];
-            const div = document.createElement('div');
-            div.className = 'cell';
-            let visible = revealed[currentPlayer][r][c];
-            let symbol = '', cls = '';
-            if(!visible){ symbol='🌫️'; cls='fog'; }
-            else if(isAsh){ symbol='✖️'; cls='ash'; }
-            else if(cell){
-              if(cell.ruined){ symbol='💀'; cls='ruins'; }
-              else{
-                switch(cell.type){
-                  case 'castle': symbol='🏰'; cls='castle'; if(cell.hp) symbol+=cell.hp; break;
-                  case 'barracks': symbol='⚔️'; cls='barracks'; break;
-                  case 'mine': symbol='⛏️'; cls='mine'; break;
-                  case 'farm': symbol='🌾'; cls='farm'; break;
-                  case 'wall': symbol='🧱'; cls='wall'; break;
-                }
+
+          function updateUI() {
+            renderBoard();
+            const t = currentTranslations || translations.ru;
+            document.getElementById('turn-counter').innerText = '📊 ' + t.turn + ': ' + totalTurns;
+
+            if (phase === 'setup') {
+              if (currentPlayer === 0) {
+                document.getElementById('p1-gold').innerHTML = '💰 0';
+                document.getElementById('p1-attacks').innerHTML = t.attacks + ' 0';
+                document.getElementById('p2-gold').innerHTML = '💰 ?';
+                document.getElementById('p2-attacks').innerHTML = t.attacks + ' ?';
+              } else {
+                document.getElementById('p2-gold').innerHTML = '💰 0';
+                document.getElementById('p2-attacks').innerHTML = t.attacks + ' 0';
+                document.getElementById('p1-gold').innerHTML = '💰 ?';
+                document.getElementById('p1-attacks').innerHTML = t.attacks + ' ?';
               }
+            } else {
+              document.getElementById('p1-gold').innerHTML = '💰 ' + players[0].gold;
+              document.getElementById('p1-attacks').innerHTML = t.attacks + ' ' + getRegiments(0);
+              document.getElementById('p2-gold').innerHTML = '💰 ' + players[1].gold;
+              document.getElementById('p2-attacks').innerHTML = t.attacks + ' ' + getRegiments(1);
             }
-            div.textContent = symbol;
-            if(cls) div.classList.add(cls);
-            div.addEventListener('click', (function(row,col){ return function(){ handleCellClick(row,col); }; })(r,c));
-            boardEl.appendChild(div);
+
+            document.getElementById('turn-indicator-text').innerHTML = t.turnIndicator(currentPlayer);
+            let msg;
+            if (phase === 'setup') {
+              msg = t.setupMsg(countAll(currentPlayer), MAX_BUILDINGS);
+            } else {
+              let attackInfo = attackModeActive ? ' (' + t.attacks + ' ' + attacksRemaining + ')' : '';
+              msg = t.statusAction(players[currentPlayer].gold, getRegiments(currentPlayer), attackInfo);
+            }
+            document.getElementById('status-msg').innerHTML = msg;
+
+            let buildDisabled = (phase!=='setup' && phase!=='action') || currentTab!=='base' || attackModeActive || repairModeActive;
+            document.querySelectorAll('.build-btn').forEach(b=>b.classList.toggle('disabled',buildDisabled));
+            let castleBtn = document.querySelector('[data-type="castle"]');
+            if (castleBtn) castleBtn.classList.toggle('disabled', phase!=='setup' || hasCastle(currentPlayer) || buildDisabled);
+            document.getElementById('attack-mode-btn').disabled = (phase!=='action' || repairModeActive || getRegiments(currentPlayer)===0);
+            document.getElementById('repair-btn').classList.toggle('disabled', (phase!=='action'&&phase!=='setup') || currentTab!=='base' || attackModeActive);
           }
-        }
-      }
-    }
-    
-    function updateUI(){
-      renderBoard();
-      if(phase==='setup'){
-        setupBuildingsPlaced[currentPlayer]=countAllPlayerBuildings(currentPlayer);
-        if(currentPlayer===0){
-          document.getElementById('p1-gold').innerHTML='💰 бесплатно';
-          document.getElementById('p1-attacks').innerHTML='⚔️ 0';
-          document.getElementById('p2-gold').innerHTML='💰 ?';
-          document.getElementById('p2-attacks').innerHTML='⚔️ ?';
-        }else{
-          document.getElementById('p2-gold').innerHTML='💰 бесплатно';
-          document.getElementById('p2-attacks').innerHTML='⚔️ 0';
-          document.getElementById('p1-gold').innerHTML='💰 ?';
-          document.getElementById('p1-attacks').innerHTML='⚔️ ?';
-        }
-      }else{
-        if(currentPlayer===0){
-          document.getElementById('p1-gold').innerHTML=`💰 ${players[0].gold}`;
-          document.getElementById('p1-attacks').innerHTML=`⚔️ ${getAvailableRegiments(0)}`;
-          document.getElementById('p2-gold').innerHTML='💰 ?';
-          document.getElementById('p2-attacks').innerHTML='⚔️ ?';
-        }else{
-          document.getElementById('p2-gold').innerHTML=`💰 ${players[1].gold}`;
-          document.getElementById('p2-attacks').innerHTML=`⚔️ ${getAvailableRegiments(1)}`;
-          document.getElementById('p1-gold').innerHTML='💰 ?';
-          document.getElementById('p1-attacks').innerHTML='⚔️ ?';
-        }
-      }
-      document.getElementById('turn-indicator').innerHTML=`${currentPlayer===0?'🔵 Игрок 1':'🔴 Игрок 2'} ходит`;
-      if(phase==='setup'){
-        document.getElementById('status-msg').innerHTML=`🏗️ Расстановка: замок + ${setupBuildingsPlaced[currentPlayer]}/${MAX_BUILDINGS} построек (БЕСПЛАТНО, клик по зданию - удалить)`;
-      }else{
-        const maxReg=getAvailableRegiments(currentPlayer);
-        const left=attackModeActive?attacksRemaining:maxReg;
-        document.getElementById('status-msg').innerHTML=`⚔️ Золото: ${players[currentPlayer].gold} | Полки: ${maxReg} (атак осталось: ${left})`;
-      }
-      const buildDisabled=(phase!=='setup' && phase!=='action') || currentTab!=='base' || attackModeActive || repairModeActive;
-      document.querySelectorAll('.build-btn').forEach(b=>b.classList.toggle('disabled',buildDisabled));
-      const castleBtn=document.querySelector('[data-type="castle"]');
-      if(castleBtn) castleBtn.classList.toggle('disabled', phase!=='setup' || hasCastle(currentPlayer) || buildDisabled);
-      const noAttacksLeft=(phase==='action' && attacksRemaining<=0 && !attackModeActive);
-      document.getElementById('attack-mode-btn').disabled=(phase!=='action' || repairModeActive || getAvailableRegiments(currentPlayer)===0 || noAttacksLeft);
-      document.getElementById('repair-btn').classList.toggle('disabled', (phase!=='action' && phase!=='setup') || currentTab!=='base' || attackModeActive);
-    }
-    
-    function deleteBuilding(row,col){
-      const cell=board[row][col];
-      if(!cell || cell.owner!==currentPlayer) return false;
-      if(cell.type==='castle'){ alert('Нельзя удалить замок!'); return false; }
-      board[row][col]=null;
-      if(ash[row][col]) ash[row][col]=false;
-      revealCell(row,col);
-      return true;
-    }
-    
-    function handleCellClick(virtualRow, virtualCol){
-      if(phase==='action' && checkGameOver()) return;
-      
-      // Преобразование координат в зависимости от вкладки и игрока
-      let globalCol = virtualCol;
-      if(currentTab === 'base'){
-        if(currentPlayer === 0) globalCol = virtualCol;
-        else globalCol = virtualCol + 10;
-      }
-      const row = virtualRow;
-      const col = globalCol;
-      
-      // Режим ремонта
-      if(repairModeActive){
-        if(currentTab!=='base'){ alert('Переключитесь на "Моё поле"'); return; }
-        const cell = board[row][col];
-        if(!cell || cell.owner!==currentPlayer) return;
-        if(!cell.ruined && !(cell.type==='castle' && cell.hp<CASTLE_MAX_HP)){ alert('Здание не повреждено'); return; }
-        if(players[currentPlayer].gold<REPAIR_COST){ alert('Недостаточно золота'); return; }
-        if(cell.ruined){
-          cell.ruined=false;
-          cell.hp=(cell.type==='castle')?CASTLE_MAX_HP:1;
-          delete cell.ruinTimer;
-        }else if(cell.type==='castle'){
-          cell.hp=Math.min(CASTLE_MAX_HP, cell.hp+1);
-        }
-        players[currentPlayer].gold-=REPAIR_COST;
-        repairModeActive=false;
-        updateUI();
-        alert('Здание восстановлено!');
-        return;
-      }
-      
-      // Фаза расстановки (строительство бесплатно)
-      if(phase==='setup' && currentTab==='base' && !attackModeActive && !repairModeActive){
-        if(getPlayerZone(col)!==currentPlayer){ alert('Стройте только на своей половине!'); return; }
-        // Если на клетке уже есть здание этого игрока — удаляем его (кроме замка)
-        if(board[row][col] && board[row][col].owner===currentPlayer){
-          if(deleteBuilding(row,col)){
+
+          function deleteBuilding(r, c) {
+            let cell = board[r][c];
+            if (!cell || cell.owner !== currentPlayer || cell.type === 'castle') return false;
+            board[r][c] = null;
+            if (ash[r][c]) ash[r][c] = false;
+            return true;
+          }
+
+          function handleCellClick(vr, vc) {
+            if (phase==='action' && (!hasCastle(0) || !hasCastle(1))) return;
+            let globalCol = vc;
+            if (currentTab === 'base') globalCol = (currentPlayer===0) ? vc : vc+10;
+            let row = vr, col = globalCol;
+
+            if (repairModeActive) {
+              if (currentTab!=='base') return;
+              let cell = board[row][col];
+              if (!cell || cell.owner!==currentPlayer) return;
+              if (!cell.ruined && !(cell.type==='castle' && cell.hp<CASTLE_MAX_HP)) { playSound('error'); return; }
+              if (players[currentPlayer].gold < REPAIR_COST) { playSound('error'); return; }
+              if (cell.ruined) { cell.ruined=false; cell.hp = (cell.type==='castle')?CASTLE_MAX_HP:1; delete cell.ruinTimer; }
+              else if (cell.type==='castle') cell.hp = Math.min(CASTLE_MAX_HP, cell.hp+1);
+              players[currentPlayer].gold -= REPAIR_COST;
+              repairModeActive = false;
+              updateUI(); playSound('repair');
+              return;
+            }
+
+            if (phase==='setup' && currentTab==='base' && !attackModeActive && !repairModeActive) {
+              if (getZone(col) !== currentPlayer) { playSound('error'); return; }
+              if (board[row][col] && board[row][col].owner===currentPlayer) {
+                if (deleteBuilding(row, col)) updateUI();
+                return;
+              }
+              if (countAll(currentPlayer) >= MAX_BUILDINGS) { playSound('error'); return; }
+              if (board[row][col] || ash[row][col]) { playSound('error'); return; }
+              let type = window.selectedBuildingType;
+              if (!type) return;
+              if (type==='castle' && hasCastle(currentPlayer)) { playSound('error'); return; }
+              if (type==='mine' && countType(currentPlayer,'mine') >= BASE_MINE_LIMIT) { playSound('error'); return; }
+              board[row][col] = { owner: currentPlayer, type, hp: type==='castle'?CASTLE_MAX_HP:1, ruined: false };
+              updateUI(); playSound('build');
+              return;
+            }
+
+            if (phase==='action' && currentTab==='base' && !attackModeActive && !repairModeActive) {
+              let type = window.selectedBuildingType;
+              if (!type || type==='castle') { playSound('error'); return; }
+              if (getZone(col) !== currentPlayer) { playSound('error'); return; }
+              if (board[row][col] || ash[row][col]) { playSound('error'); return; }
+              if (countAll(currentPlayer) >= MAX_BUILDINGS) { playSound('error'); return; }
+              let limit = getMineLimit(currentPlayer);
+              if (type==='mine' && countType(currentPlayer,'mine') >= limit) { playSound('error'); return; }
+              if (players[currentPlayer].gold < BUILD_COST) { playSound('error'); return; }
+              board[row][col] = { owner: currentPlayer, type, hp:1, ruined: false };
+              players[currentPlayer].gold -= BUILD_COST;
+              updateUI(); playSound('build');
+              return;
+            }
+
+            if (phase==='action' && attackModeActive && currentTab === 'map') {
+              if (attacksRemaining <= 0) { attackModeActive=false; updateUI(); return; }
+              performAttack(row, col);
+              attacksRemaining--;
+              if (attacksRemaining <= 0) attackModeActive = false;
+              updateUI();
+              if (!hasCastle(0) || !hasCastle(1)) {
+                let winner = !hasCastle(0) ? 1 : 0;
+                const t = currentTranslations || translations.ru;
+                document.getElementById('victory-message').innerText = (winner===0 ? t.player1 : t.player2) + ' ' + t.victory;
+                document.getElementById('victory-screen').style.display = 'flex';
+              }
+              return;
+            }
+          }
+
+          window.selectedBuildingType = 'castle';
+          document.querySelectorAll('.build-btn').forEach(btn=>{
+            btn.addEventListener('click',()=>{
+              if (btn.classList.contains('disabled')) return;
+              window.selectedBuildingType = btn.dataset.type;
+              document.getElementById('status-msg').innerHTML = 'Выбрано: ' + btn.textContent;
+              playSound('build');
+            });
+          });
+          document.getElementById('repair-btn').addEventListener('click',()=>{
+            if (document.getElementById('repair-btn').classList.contains('disabled')) return;
+            if (attackModeActive) { playSound('error'); return; }
+            repairModeActive = !repairModeActive;
+            if (repairModeActive) attackModeActive = false;
+            currentTab = 'base';
+            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+            document.querySelector('[data-tab="base"]').classList.add('active');
             updateUI();
-            alert('Здание удалено');
+          });
+          document.querySelectorAll('.tab-btn').forEach(btn=>{
+            btn.addEventListener('click',()=>{
+              if (attackModeActive||repairModeActive){ attackModeActive=false; repairModeActive=false; }
+              currentTab = btn.dataset.tab;
+              document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+              btn.classList.add('active');
+              updateUI();
+            });
+          });
+          document.getElementById('attack-mode-btn').addEventListener('click',()=>{
+            if (document.getElementById('attack-mode-btn').disabled) return;
+            if (repairModeActive) { playSound('error'); return; }
+            if (attackModeActive) { attackModeActive=false; updateUI(); }
+            else {
+              let avail = getRegiments(currentPlayer);
+              if (avail<=0) { playSound('error'); return; }
+              attackModeActive = true;
+              attacksRemaining = avail;
+              currentTab = 'map';
+              document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+              document.querySelector('[data-tab="map"]').classList.add('active');
+              updateUI();
+            }
+          });
+          document.getElementById('cancel-attack-btn').addEventListener('click',()=>{
+            if (attackModeActive) { attackModeActive=false; updateUI(); }
+            else if (repairModeActive) { repairModeActive=false; updateUI(); }
+          });
+
+          function passTurn() {
+            if (attackModeActive||repairModeActive) { playSound('error'); return; }
+            if (phase==='setup') {
+              if (countAll(currentPlayer) < MAX_BUILDINGS) { playSound('error'); return; }
+              if (!hasCastle(currentPlayer)) { playSound('error'); return; }
+              if (currentPlayer === 0) {
+                currentPlayer = 1;
+              } else {
+                if (countAll(0) === MAX_BUILDINGS && countAll(1) === MAX_BUILDINGS) {
+                  phase = 'action';
+                  currentPlayer = 0;
+                  players[0].gold = 5;
+                  players[1].gold = 5;
+                }
+              }
+              updateUI();
+            } else if (phase==='action') {
+              collectIncome(currentPlayer);
+              processRuins();
+              currentPlayer = currentPlayer===0?1:0;
+              attackModeActive = false; repairModeActive = false;
+              attacksRemaining = getRegiments(currentPlayer);
+              updateUI();
+            }
+            totalTurns++;
+            document.getElementById('turn-counter').innerText = '📊 ' + (currentTranslations||translations.ru).turn + ': ' + totalTurns;
+            playSound('pass');
+            const t = currentTranslations || translations.ru;
+            document.getElementById('next-player-label').innerText = t.passScreen + ' ' + (currentPlayer===0 ? t.player1 : t.player2);
+            document.getElementById('pass-screen').classList.add('active');
           }
-          return;
-        }
-        if(countAllPlayerBuildings(currentPlayer)>=MAX_BUILDINGS){ alert(`Лимит ${MAX_BUILDINGS} построек`); return; }
-        if(board[row][col] || ash[row][col]){ alert('Клетка занята или выжжена'); return; }
-        const type=window.selectedBuildingType;
-        if(!type){ alert('Выберите тип постройки'); return; }
-        if(type==='castle' && hasCastle(currentPlayer)){ alert('У вас уже есть замок!'); return; }
-        if(type==='mine' && countBuildingsOfType(currentPlayer,'mine')>=BASE_MINE_LIMIT){ alert(`В расстановке можно построить не более ${BASE_MINE_LIMIT} рудников`); return; }
-        // Строим
-        board[row][col]={ owner:currentPlayer, type, hp:type==='castle'?CASTLE_MAX_HP:1, ruined:false };
-        revealed[currentPlayer][row][col]=true;
-        updateUI();
-        return;
-      }
-      
-      // Строительство в боевой фазе (за золото)
-      if(phase==='action' && currentTab==='base' && !attackModeActive && !repairModeActive){
-        const type=window.selectedBuildingType;
-        if(!type){ alert('Выберите тип постройки'); return; }
-        if(type==='castle'){ alert('Нельзя построить новый замок'); return; }
-        if(getPlayerZone(col)!==currentPlayer){ alert('Строить можно только на своей половине'); return; }
-        if(board[row][col] || ash[row][col]){ alert('Клетка занята или выжжена'); return; }
-        if(countAllPlayerBuildings(currentPlayer)>=MAX_BUILDINGS){ alert(`Лимит ${MAX_BUILDINGS} построек`); return; }
-        const mineLimit=getMineLimit(currentPlayer);
-        if(type==='mine' && countBuildingsOfType(currentPlayer,'mine')>=mineLimit){ alert(`Максимум рудников: ${mineLimit} (бонус за слабость врага)`); return; }
-        if(players[currentPlayer].gold<BUILD_COST){ alert(`Недостаточно золота, нужно ${BUILD_COST}`); return; }
-        board[row][col]={ owner:currentPlayer, type, hp:1, ruined:false };
-        players[currentPlayer].gold-=BUILD_COST;
-        revealed[currentPlayer][row][col]=true;
-        updateUI();
-        return;
-      }
-      
-      // Атака (только на карте разведки)
-      if(phase==='action' && attackModeActive){
-        if(currentTab!=='map'){ alert('Для атаки переключитесь на "Карту разведки"'); return; }
-        if(attacksRemaining<=0){ attackModeActive=false; updateUI(); alert('Нет доступных атак'); return; }
-        const result=performAttack(row,col);
-        alert(result.reason);
-        if(result.costAttack!==false) attacksRemaining--;
-        if(attacksRemaining<=0) attackModeActive=false;
-        updateUI();
-        if(phase==='action') checkGameOver();
-        return;
-      }
-    }
-    
-    window.selectedBuildingType='castle';
-    document.querySelectorAll('.build-btn').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        if(btn.classList.contains('disabled')) return;
-        window.selectedBuildingType=btn.dataset.type;
-        document.getElementById('status-msg').innerHTML=`Выбрано: ${btn.textContent}`;
-      });
-    });
-    document.getElementById('repair-btn').addEventListener('click',()=>{
-      if(document.getElementById('repair-btn').classList.contains('disabled')) return;
-      if(attackModeActive){ alert('Сначала выйдите из режима атаки'); return; }
-      repairModeActive=!repairModeActive;
-      currentTab='base';
-      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-      document.querySelector('[data-tab="base"]').classList.add('active');
-      updateUI();
-    });
-    document.querySelectorAll('.tab-btn').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        if(attackModeActive || repairModeActive){ attackModeActive=false; repairModeActive=false; }
-        currentTab=btn.dataset.tab;
-        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        updateUI();
-      });
-    });
-    
-    const attackBtn = document.getElementById('attack-mode-btn');
-    attackBtn.addEventListener('click',()=>{
-      if(attackBtn.disabled) return;
-      if(repairModeActive){ alert('Завершите режим ремонта'); return; }
-      if(attackModeActive){
-        attackModeActive=false;
-        updateUI();
-        alert('Режим атаки отменён');
-      } else {
-        const available=getAvailableRegiments(currentPlayer);
-        if(available<=0){ alert('Нет доступных полков'); return; }
-        attackModeActive=true;
-        attacksRemaining=available;
-        currentTab='map';
-        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-        document.querySelector('[data-tab="map"]').classList.add('active');
-        updateUI();
-      }
-    });
-    document.getElementById('cancel-attack-btn').addEventListener('click',()=>{
-      if(attackModeActive){
-        attackModeActive=false;
-        updateUI();
-        alert('Режим атаки отменён');
-      } else if(repairModeActive){
-        repairModeActive=false;
-        updateUI();
-        alert('Режим ремонта отменён');
-      } else {
-        alert('Нет активного режима');
-      }
-    });
-    
-    function passTurn(){
-      if(attackModeActive || repairModeActive){ alert('Завершите текущий режим (атака/ремонт) или нажмите "Отмена"'); return; }
-      if(phase==='setup'){
-        if(countAllPlayerBuildings(currentPlayer)<MAX_BUILDINGS){ alert(`Постройте ${MAX_BUILDINGS} зданий`); return; }
-        if(!hasCastle(currentPlayer)){ alert('Постройте замок'); return; }
-        if(currentPlayer===0) currentPlayer=1;
-        else {
-          if(countAllPlayerBuildings(0)===MAX_BUILDINGS && countAllPlayerBuildings(1)===MAX_BUILDINGS){
-            phase='action';
-            currentPlayer=0;
-            attacksRemaining=getAvailableRegiments(0);
+
+          document.getElementById('pass-turn-btn').addEventListener('click', passTurn);
+          document.getElementById('confirm-pass-btn').addEventListener('click',()=>{
+            document.getElementById('pass-screen').classList.remove('active');
+            currentTab = 'base';
+            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+            document.querySelector('[data-tab="base"]').classList.add('active');
+            updateUI();
+          });
+          document.getElementById('restart-btn').addEventListener('click', ()=>location.reload());
+
+          for (let r=0; r<ROWS; r++) {
+            for (let c=0; c<COLS; c++) {
+              if (c < 10) revealed[0][r][c] = true;
+              else revealed[1][r][c] = true;
+            }
           }
-        }
-        updateUI();
-      }else if(phase==='action'){
-        collectIncome(currentPlayer);
-        processRuinsForAll();
-        currentPlayer=currentPlayer===0?1:0;
-        attackModeActive=false; repairModeActive=false;
-        attacksRemaining=getAvailableRegiments(currentPlayer);
-        updateUI();
-      }
-      document.getElementById('pass-screen').style.display='flex';
-      document.getElementById('next-player-label').innerText=`Передайте устройство ${players[currentPlayer].name}`;
+          updateUI();
+
+          window.gameLocalize = (t) => {
+            currentTranslations = t;
+            document.getElementById('p1-name').innerHTML = '🧑‍🌾 ' + t.player1;
+            document.getElementById('p2-name').innerHTML = '👑 ' + t.player2;
+            document.querySelector('[data-type="castle"]').innerHTML = t.buildCastle;
+            document.querySelector('[data-type="barracks"]').innerHTML = t.buildBarracks;
+            document.querySelector('[data-type="mine"]').innerHTML = t.buildMine;
+            document.querySelector('[data-type="farm"]').innerHTML = t.buildFarm;
+            document.querySelector('[data-type="wall"]').innerHTML = t.buildWall;
+            document.getElementById('repair-btn').innerHTML = t.repair;
+            document.getElementById('attack-mode-btn').innerHTML = t.attack;
+            document.getElementById('cancel-attack-btn').innerHTML = t.cancel;
+            document.getElementById('pass-turn-btn').innerHTML = t.endTurn;
+            document.querySelector('[data-tab="base"]').innerHTML = t.myField;
+            document.querySelector('[data-tab="map"]').innerHTML = t.map;
+            document.querySelector('[data-tab="encyclopedia"]').innerHTML = t.encyclopediaTab;
+            document.querySelector('#game-container h1').innerHTML = t.gameTitle;
+            updateUI();
+          };
+          window.gameSetSound = (v) => { soundEnabled = v; };
+          window.gameReset = () => location.reload();
+        })();
+      `;
+      gameDiv.appendChild(script);
     }
-    document.getElementById('pass-turn-btn').addEventListener('click',passTurn);
-    document.getElementById('confirm-pass-btn').addEventListener('click',()=>{
-      document.getElementById('pass-screen').style.display='none';
-      currentTab='base';
-      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-      document.querySelector('[data-tab="base"]').classList.add('active');
-      updateUI();
-      if(phase==='action') checkGameOver();
-    });
-    document.getElementById('restart-btn').addEventListener('click',()=>location.reload());
-    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) revealed[getPlayerZone(c)][r][c]=true;
-    updateUI();
+
+    applyLanguage();
+    applyTheme();
   })();
 </script>
 </body>
